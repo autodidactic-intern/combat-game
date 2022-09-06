@@ -230,7 +230,8 @@ class Circle(Sprite):
     def update(self):
         self.rect.center = self.rect_.center
 
-
+#width 350-650-950
+#      3.71-2-1.3/ height 2
 class Player(Entity):
     def __init__(self, name):
         super().__init__(name)
@@ -238,8 +239,15 @@ class Player(Entity):
         pg.draw.circle(self.image, BLUE, (10, 10), 10)
         pg.draw.rect(self.image, BLUE, (0, 10, 20, 20))
         self.rect = self.image.get_rect()
-        self.rect.x = SCREEN_WIDTH / 2
-        self.rect.y = SCREEN_HEIGHT / 2
+        self.listx={"player1":SCREEN_WIDTH /3.71,"player2":SCREEN_WIDTH /2,"player3":SCREEN_WIDTH /1.3}
+        self.listy={"player1":SCREEN_HEIGHT /2,"player2":SCREEN_HEIGHT /2,"player3":SCREEN_HEIGHT /2}
+        self.rect.x= self.listx["player2"]
+        self.rect.y= self.listy["player2"]
+     #   self.rect.x = random.randrange(SCREEN_WIDTH)
+     #   self.rect.y = random.randrange(SCREEN_HEIGHT - 50)
+  #      self.rect.x = SCREEN_WIDTH / 3.71
+   #     self.rect.y = SCREEN_HEIGHT /2
+
         self.pos = (self.rect.x, self.rect.y)
         self.base_image = self.image
         self.base_center = self.rect.center
@@ -349,6 +357,8 @@ class Player(Entity):
 
 
 
+
+
 class Bullet(Entity):
     def __init__(self, current_x, current_y, target, owner, name=None):
         super().__init__(name)
@@ -412,11 +422,13 @@ class Game():
         self.entity_list = pg.sprite.Group()
         self.bullet_list = pg.sprite.Group()
         self.block_number = 3
+        self.player_number= 2
+
         self.msg_box = []
         self.player = Player('f'+str(0))
         self.player.msg_box = self.msg_box
         self.player_list.add(self.player)
-
+        self.init_players()
         self.init_blocks()
         self.entity_list.add(self.player_list, self.block_list)
         self.all_sprites_list.add(self.player.circle, self.player.circle2, self.player)
@@ -437,6 +449,16 @@ class Game():
             self.block_list.add(block)
             self.all_sprites_list.add(block, block.circle, block.circle2)
             self.player.entity_list.append((block, block.gid))
+    def init_players(self):
+        for i in range(self.player_number):
+            player=Player('h'+str(i))
+            player.msg_box = self.msg_box
+            player.all_sprites_list = self.all_sprites_list
+            player.bullet_list = self.bullet_list
+            player.entity_list.append((self.player, self.player.gid))
+            self.player_list.add(player)
+            self.all_sprites_list.add(player, player.circle, player.circle2)
+            self.player.entity_list.append((player, player.gid))
 
     def reset(self):
         self.__init__()
@@ -582,4 +604,16 @@ if __name__ == "__main__":
         while not game.quit:
             game.execute()
     pg.quit()
-
+#random agent action
+class Agent():
+    def __init__(self,env):
+        self.action_size=env.action_space.n
+    def get_action(self):
+        action = random.choice(range(self.action_size))
+        return action
+#env=gym.make(env_name)
+agent=Agent(env)
+for i in range(200):
+    action=agent.get_action(state)
+    state,reward,done,info = env.step(action)
+    env.render()
